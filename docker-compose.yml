@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+
+  frontend:
+    build: ./dockerhw2-frontend
+    ports:
+      - "3000:3000"
+    restart: always
+    depends_on:
+      - api
+
+  api:
+    build: ./DockerHW2
+    ports:
+      - "5296:5296"
+    restart: always
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnectionString=Server=mssql;Database=DockerDb;User Id=sa;Password=DBPassword123!;Encrypt=False;TrustServerCertificate=True
+    depends_on:
+      - mssql
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: always
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "DBPassword123!"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080"
+    restart: always
+
+volumes:
+  mssql_data:
